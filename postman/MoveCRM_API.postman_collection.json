@@ -1,0 +1,647 @@
+{
+  "info": {
+    "name": "MoveCRM API",
+    "description": "Complete API collection for MoveCRM MVP testing",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "yoloe_url",
+      "value": "http://localhost:8001",
+      "type": "string"
+    },
+    {
+      "key": "tenant_slug",
+      "value": "demo",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Backend Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "YOLOE Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{yoloe_url}}/health",
+              "host": ["{{yoloe_url}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@demo.com\",\n  \"password\": \"password123\",\n  \"name\": \"Demo Admin\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.access_token) {",
+                  "        pm.collectionVariables.set('access_token', response.access_token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@demo.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public Endpoints",
+      "item": [
+        {
+          "name": "Submit Quote (Widget)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "John Smith",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "john@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": "(555) 123-4567",
+                  "type": "text"
+                },
+                {
+                  "key": "pickup_address",
+                  "value": "123 Main St, City, State 12345",
+                  "type": "text"
+                },
+                {
+                  "key": "delivery_address",
+                  "value": "456 Oak Ave, City, State 67890",
+                  "type": "text"
+                },
+                {
+                  "key": "move_date",
+                  "value": "2024-12-15",
+                  "type": "text"
+                },
+                {
+                  "key": "notes",
+                  "value": "Need help with packing fragile items",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/public/quote",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", "quote"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quotes Management",
+      "item": [
+        {
+          "name": "Get All Quotes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/quotes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "quotes"]
+            }
+          }
+        },
+        {
+          "name": "Get Quote by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/quotes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "quotes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Quote",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"estimated_price\": 1500.00,\n  \"notes\": \"Quote approved with standard pricing\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/quotes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "quotes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Quote",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/quotes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "quotes", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "YOLOE Detection",
+      "item": [
+        {
+          "name": "Auto Detection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/detect/auto",
+              "host": ["{{base_url}}"],
+              "path": ["api", "detect", "auto"]
+            }
+          }
+        },
+        {
+          "name": "Text Prompted Detection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "prompt",
+                  "value": "furniture items",
+                  "type": "text"
+                },
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/detect/text",
+              "host": ["{{base_url}}"],
+              "path": ["api", "detect", "text"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Management",
+      "item": [
+        {
+          "name": "Get Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/customers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "customers"]
+            }
+          }
+        },
+        {
+          "name": "Get Pricing Rules",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/pricing-rules",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pricing-rules"]
+            }
+          }
+        },
+        {
+          "name": "Update Pricing Rules",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"base_rate_per_cubic_foot\": 15.00,\n  \"labor_rate_per_hour\": 85.00,\n  \"mileage_rate\": 2.50,\n  \"minimum_charge\": 200.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/pricing-rules",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pricing-rules"]
+            }
+          }
+        },
+        {
+          "name": "Get Item Catalog",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/item-catalog",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "item-catalog"]
+            }
+          }
+        },
+        {
+          "name": "Update Item Catalog",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"name\": \"Sofa\",\n      \"aliases\": [\"couch\", \"sectional\", \"loveseat\"],\n      \"cubic_feet\": 40.0,\n      \"weight_lbs\": 150.0,\n      \"category\": \"furniture\"\n    },\n    {\n      \"name\": \"Dining Table\",\n      \"aliases\": [\"table\", \"dining set\"],\n      \"cubic_feet\": 25.0,\n      \"weight_lbs\": 100.0,\n      \"category\": \"furniture\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/item-catalog",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "item-catalog"]
+            }
+          }
+        },
+        {
+          "name": "Get Brand Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/brand-settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "brand-settings"]
+            }
+          }
+        },
+        {
+          "name": "Update Brand Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "X-Tenant-Slug",
+                "value": "{{tenant_slug}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_name\": \"Demo Moving Company\",\n  \"logo_url\": \"https://example.com/logo.png\",\n  \"primary_color\": \"#2563eb\",\n  \"secondary_color\": \"#64748b\",\n  \"contact_email\": \"info@demo.com\",\n  \"contact_phone\": \"(555) 123-MOVE\",\n  \"website_url\": \"https://demo.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/brand-settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "brand-settings"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Direct YOLOE Service",
+      "item": [
+        {
+          "name": "YOLOE Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{yoloe_url}}/health",
+              "host": ["{{yoloe_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "YOLOE Auto Detect",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{yoloe_url}}/detect/auto",
+              "host": ["{{yoloe_url}}"],
+              "path": ["detect", "auto"]
+            }
+          }
+        },
+        {
+          "name": "YOLOE Text Detect",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "prompt",
+                  "value": "furniture items",
+                  "type": "text"
+                },
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{yoloe_url}}/detect/text",
+              "host": ["{{yoloe_url}}"],
+              "path": ["detect", "text"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

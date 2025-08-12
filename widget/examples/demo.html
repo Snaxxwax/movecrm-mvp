@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoveCRM Widget Demo - Acme Moving Company</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+            background: #f8fafc;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #4299e1;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: #3182ce;
+        }
+        
+        .services {
+            padding: 4rem 0;
+        }
+        
+        .services h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2d3748;
+        }
+        
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        
+        .service-card p {
+            color: #718096;
+        }
+        
+        .testimonials {
+            background: #f8fafc;
+            padding: 4rem 0;
+        }
+        
+        .testimonials h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2d3748;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .testimonial {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .testimonial blockquote {
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+        
+        .testimonial cite {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-section p,
+        .footer-section a {
+            color: #a0aec0;
+            text-decoration: none;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .widget-demo-section {
+            background: #e6fffa;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .widget-demo-section h2 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        
+        .widget-demo-section p {
+            color: #4a5568;
+            margin-bottom: 2rem;
+        }
+        
+        .demo-button {
+            background: #38b2ac;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .demo-button:hover {
+            background: #319795;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🚚 Acme Moving Company</h1>
+            <p>Your trusted partner for stress-free relocations</p>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Professional Moving Services</h1>
+            <p>We make your move simple, safe, and stress-free with our experienced team and modern equipment.</p>
+            <a href="#services" class="cta-button">Learn More</a>
+        </div>
+    </section>
+
+    <section class="widget-demo-section">
+        <div class="container">
+            <h2>Get Your Free Moving Quote</h2>
+            <p>Click the button below or use the floating widget to get an instant quote for your move!</p>
+            <button class="demo-button" onclick="MoveCRMWidget.open()">Open Quote Widget</button>
+        </div>
+    </section>
+
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>🏠 Residential Moving</h3>
+                    <p>Complete home moving services including packing, loading, transportation, and unpacking.</p>
+                </div>
+                <div class="service-card">
+                    <h3>🏢 Commercial Moving</h3>
+                    <p>Office and business relocations with minimal downtime and professional handling.</p>
+                </div>
+                <div class="service-card">
+                    <h3>📦 Packing Services</h3>
+                    <p>Professional packing and unpacking services to ensure your items are safe during transport.</p>
+                </div>
+                <div class="service-card">
+                    <h3>🚛 Long Distance</h3>
+                    <p>Interstate and long-distance moving with tracking and insurance coverage.</p>
+                </div>
+                <div class="service-card">
+                    <h3>🏪 Storage Solutions</h3>
+                    <p>Secure storage facilities for short-term and long-term storage needs.</p>
+                </div>
+                <div class="service-card">
+                    <h3>🎹 Specialty Items</h3>
+                    <p>Expert handling of pianos, artwork, antiques, and other valuable items.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="container">
+            <h2>What Our Customers Say</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <blockquote>"Acme Moving made our cross-country move so easy! The team was professional, careful with our belongings, and the quote was accurate."</blockquote>
+                    <cite>- Sarah Johnson, San Francisco</cite>
+                </div>
+                <div class="testimonial">
+                    <blockquote>"Best moving experience ever! They handled our piano and antique furniture with such care. Highly recommended!"</blockquote>
+                    <cite>- Mike Chen, Seattle</cite>
+                </div>
+                <div class="testimonial">
+                    <blockquote>"The online quote system was so convenient, and the actual move went exactly as planned. Great communication throughout."</blockquote>
+                    <cite>- Emily Rodriguez, Austin</cite>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>📞 (555) 123-MOVE</p>
+                    <p>✉️ info@acmemoving.com</p>
+                    <p>📍 123 Moving St, City, State 12345</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <p><a href="#services">Residential Moving</a></p>
+                    <p><a href="#services">Commercial Moving</a></p>
+                    <p><a href="#services">Packing Services</a></p>
+                    <p><a href="#services">Storage Solutions</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>About</h3>
+                    <p><a href="#">Our Story</a></p>
+                    <p><a href="#">Careers</a></p>
+                    <p><a href="#">Insurance</a></p>
+                    <p><a href="#">Reviews</a></p>
+                </div>
+            </div>
+            <p>&copy; 2024 Acme Moving Company. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- MoveCRM Widget -->
+    <script src="../src/movecrm-widget.js"></script>
+    <script>
+        // Initialize the MoveCRM widget
+        MoveCRMWidget.init({
+            tenantSlug: 'acme-moving',
+            apiUrl: 'http://localhost:5000/api',
+            primaryColor: '#38b2ac',
+            theme: 'light'
+        });
+    </script>
+</body>
+</html>
+

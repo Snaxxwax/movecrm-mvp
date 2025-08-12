@@ -1,0 +1,223 @@
+# MoveCRM Laptop Edition - Docker Compose
+# Optimized for laptop development with resource constraints
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database (lightweight config)
+  postgres:
+    image: postgres:15-alpine
+    container_name: movecrm-postgres-laptop
+    environment:
+      POSTGRES_DB: movecrm
+      POSTGRES_USER: movecrm
+      POSTGRES_PASSWORD: movecrm_dev
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_laptop:/var/lib/postgresql/data
+      - ./docs/database_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - movecrm-laptop
+    # Reduced memory usage for laptops
+    command: >
+      postgres 
+      -c shared_buffers=128MB 
+      -c effective_cache_size=256MB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U movecrm -d movecrm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (lightweight config)
+  redis:
+    image: redis:7-alpine
+    container_name: movecrm-redis-laptop
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_laptop:/data
+    networks:
+      - movecrm-laptop
+    # Optimized for laptop
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SuperTokens Core
+  supertokens:
+    image: registry.supertokens.io/supertokens/supertokens-postgresql:7.0
+    container_name: movecrm-supertokens-laptop
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3567:3567"
+    environment:
+      POSTGRESQL_CONNECTION_URI: "postgresql://movecrm:movecrm_dev@postgres:5432/movecrm"
+      API_KEYS: "supertokens-dev-key"
+    networks:
+      - movecrm-laptop
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3567/hello"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (development mode)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: movecrm-backend-laptop
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      supertokens:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=true
+      - DATABASE_URL=postgresql://movecrm:movecrm_dev@postgres:5432/movecrm
+      - REDIS_URL=redis://redis:6379/0
+      - SUPERTOKENS_CONNECTION_URI=http://supertokens:3567
+      - SUPERTOKENS_API_KEY=supertokens-dev-key
+      - YOLOE_SERVICE_URL=http://yoloe-service:8001
+      - SECRET_KEY=laptop-dev-secret-key
+      - UPLOAD_FOLDER=/app/uploads
+      - MAX_CONTENT_LENGTH=52428800
+      # Laptop-specific optimizations
+      - WORKERS=1
+      - THREADS=2
+    volumes:
+      - ./backend:/app
+      - backend_uploads_laptop:/app/uploads
+    networks:
+      - movecrm-laptop
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # YOLOE Service (CPU optimized for laptops)
+  yoloe-service:
+    build:
+      context: ./yoloe-service
+      dockerfile: Dockerfile
+    container_name: movecrm-yoloe-laptop
+    ports:
+      - "8001:8001"
+    environment:
+      - SERVICE_HOST=0.0.0.0
+      - SERVICE_PORT=8001
+      - DEBUG=true
+      - YOLOE_MODEL_PATH=yolov8n.pt  # Nano model for faster CPU inference
+      - CONFIDENCE_THRESHOLD=0.5
+      - IOU_THRESHOLD=0.45
+      - MAX_DETECTIONS=50  # Reduced for laptop performance
+      - DEVICE=cpu  # Force CPU for laptop compatibility
+      - UPLOAD_DIR=/app/uploads
+      - MAX_FILE_SIZE_MB=25  # Reduced file size for laptops
+      - MAX_CONCURRENT_JOBS=2  # Reduced concurrent processing
+    volumes:
+      - ./yoloe-service:/app
+      - yoloe_uploads_laptop:/app/uploads
+      - yoloe_models_laptop:/app/models
+    networks:
+      - movecrm-laptop
+    # Resource limits for laptops
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend (development build)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: movecrm-frontend-laptop
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+      - VITE_WIDGET_URL=http://localhost:8080
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - movecrm-laptop
+    depends_on:
+      - backend
+
+  # Widget CDN
+  widget-cdn:
+    image: nginx:alpine
+    container_name: movecrm-widget-laptop
+    ports:
+      - "8080:80"
+    volumes:
+      - ./widget/dist:/usr/share/nginx/html
+      - ./widget/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - movecrm-laptop
+
+  # MinIO (lightweight for development)
+  minio:
+    image: minio/minio:latest
+    container_name: movecrm-minio-laptop
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: devuser
+      MINIO_ROOT_PASSWORD: devpass123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data_laptop:/data
+    networks:
+      - movecrm-laptop
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  postgres_data_laptop:
+    driver: local
+  redis_data_laptop:
+    driver: local
+  backend_uploads_laptop:
+    driver: local
+  yoloe_uploads_laptop:
+    driver: local
+  yoloe_models_laptop:
+    driver: local
+  minio_data_laptop:
+    driver: local
+
+networks:
+  movecrm-laptop:
+    driver: bridge

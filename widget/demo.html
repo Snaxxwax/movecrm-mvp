@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoveCRM Widget Demo - Your Moving Company</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #6b7280;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #111827;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        /* Main Content */
+        .main {
+            padding: 60px 0;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .info-section {
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .info-section h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .feature-list li {
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            color: #10b981;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .cta-section {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .cta-section h3 {
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .cta-section p {
+            color: #6b7280;
+        }
+
+        /* Widget Container */
+        .widget-container {
+            position: sticky;
+            top: 20px;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #111827;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer p {
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .widget-container {
+                position: static;
+            }
+        }
+
+        /* Admin Panel Button */
+        .admin-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #111827;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.2s;
+        }
+
+        .admin-button:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">🚚 ABC Moving Company</div>
+                <div class="nav-links">
+                    <a href="#services">Services</a>
+                    <a href="#about">About</a>
+                    <a href="#contact">Contact</a>
+                    <a href="#quote">Get Quote</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Professional Moving Services</h1>
+            <p>Get an instant quote for your next move</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="content-grid">
+                <!-- Info Section -->
+                <div class="info-section">
+                    <h2>Why Choose ABC Moving?</h2>
+                    <p style="color: #6b7280; margin-bottom: 20px;">
+                        With over 20 years of experience, we make your move stress-free and efficient.
+                    </p>
+                    
+                    <ul class="feature-list">
+                        <li>Licensed and Insured</li>
+                        <li>Professional Packing Services</li>
+                        <li>Local and Long Distance</li>
+                        <li>Storage Solutions Available</li>
+                        <li>Free Estimates</li>
+                        <li>24/7 Customer Support</li>
+                    </ul>
+
+                    <div class="cta-section">
+                        <h3>Ready to Move?</h3>
+                        <p>Fill out the form to get your instant quote. It only takes 2 minutes!</p>
+                    </div>
+
+                    <div style="margin-top: 30px; padding: 20px; background: #fef3c7; border-radius: 8px;">
+                        <h4 style="color: #92400e; margin-bottom: 10px;">🎯 Demo Mode</h4>
+                        <p style="color: #92400e; font-size: 14px;">
+                            This is a demo of the MoveCRM widget embedded on a moving company website.
+                            Fill out the form to see how quotes are created and stored in the database.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Widget Container -->
+                <div class="widget-container">
+                    <iframe 
+                        src="http://localhost:8080" 
+                        style="width: 100%; height: 800px; border: none; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);"
+                        title="MoveCRM Quote Widget">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">15+</div>
+                    <div class="stat-label">Years Experience</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Professional Movers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Customer Support</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 ABC Moving Company. All rights reserved.</p>
+            <p style="font-size: 12px; margin-top: 20px;">
+                Powered by MoveCRM - The smart CRM for moving companies
+            </p>
+        </div>
+    </footer>
+
+    <!-- Admin Panel Button -->
+    <a href="http://localhost:8082" class="admin-button" target="_blank">
+        🔧 Admin Panel
+    </a>
+
+    <script>
+        // Optional: Add some interactivity
+        console.log('MoveCRM Widget Demo Page Loaded');
+        
+        // You could add analytics, tracking, or other features here
+    </script>
+</body>
+</html>
