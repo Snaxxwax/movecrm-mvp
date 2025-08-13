@@ -1,0 +1,35 @@
+# Use an official RunPod base image with PyTorch and CUDA pre-installed
+# This saves time and ensures compatibility with the RunPod environment.
+# Check RunPod docs for the latest recommended images.
+FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel
+
+# Set the working directory
+WORKDIR /app
+
+# Set environment variables to prevent interactive prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies that might be required by Python packages
+# For example, opencv-python requires libgl1-mesa-glx
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the requirements file first to leverage Docker layer caching
+COPY requirements.txt .
+
+# Install Python dependencies
+# Using --no-cache-dir reduces the image size
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install the RunPod Python library
+RUN pip install --no-cache-dir runpod
+
+# Copy the rest of the application code
+COPY . .
+
+# Define the default command to run when the container starts.
+# This will start the RunPod serverless worker, which will in turn
+# use our runpod_handler.py script.
+CMD ["python", "-u", "runpod_handler.py"]

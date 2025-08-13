@@ -1,0 +1,36 @@
+# Google Cloud Build configuration for MoveCRM Backend
+# This file defines the steps to build the Docker image and push it to Google Artifact Registry.
+
+steps:
+  # 1. Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
+      - '.'
+    id: 'Build Docker Image'
+
+  # 2. Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
+    id: 'Push to Artifact Registry'
+
+# Define the images to be created
+images:
+  - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
+
+# Allow substitution variables to be passed at build time
+options:
+  substitution_option: 'ALLOW_LOOSE'
+
+# Default substitution variables
+substitutions:
+  _LOCATION: 'us-central1'         # e.g., us-central1
+  _REPOSITORY: 'movecrm-services'  # Your Artifact Registry repository name
+  _IMAGE_NAME: 'backend'           # Name for this specific image
+
+# Example command to trigger this build:
+# gcloud builds submit --config cloudbuild.yaml --substitutions=_LOCATION=us-central1,_REPOSITORY=my-repo
