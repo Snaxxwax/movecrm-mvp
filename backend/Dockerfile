@@ -51,16 +51,21 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY --chown=movecrm:movecrm . .
 
+# Make entrypoint script executable
+RUN chmod +x /app/entrypoint.sh
+
 # Switch to non-root user
 USER movecrm
 
 # Expose port
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+# Health check (will be adapted by Cloud Run's health checker)
+# The port is dynamic, so we can't hardcode it here.
+# Cloud platforms will override this.
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+#     CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
 
-# Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--worker-class", "gevent", "--worker-connections", "1000", "--timeout", "120", "--keepalive", "2", "--max-requests", "1000", "--max-requests-jitter", "100", "--access-logfile", "-", "--error-logfile", "-", "src.main:app"]
+# Run the application via the entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
 

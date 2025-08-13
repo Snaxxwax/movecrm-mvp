@@ -325,6 +325,101 @@ docker-compose logs -f backend
 docker-compose logs -f yoloe-service
 ```
 
+## 🚀 Deployment Recommendations
+
+This project is designed to be deployed in a flexible, cost-effective, and scalable way. The following are recommendations for a production-grade setup that is both powerful and lightweight.
+
+### 1. Frontend (React Dashboard)
+
+The frontend is a static React application. It should not be run in a Node.js server in production. Instead, it should be built and deployed to a static hosting platform.
+
+- **Platform**: **Vercel** (Recommended), Netlify, or Cloudflare Pages.
+- **Why**: These platforms offer automatic builds and deployments from your Git repository, a global CDN for high performance, and generous free tiers that are often sufficient for many applications.
+- **Setup**:
+    1. Create a new project on Vercel and connect it to your Git repository.
+    2. Vercel will automatically detect the React frontend and configure the build settings. The `frontend/vercel.json` file provides an optimal configuration.
+    3. Set the `VITE_API_URL` environment variable in the Vercel project settings to point to your deployed backend API URL.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F<YOUR_GIT_USERNAME>%2F<YOUR_REPO_NAME>&root-directory=frontend&env=VITE_API_URL&envDescription=The%20URL%20of%20your%20deployed%20backend%20API)
+
+*(Note: You will need to replace the repository URL in the deploy button link with your own).*
+
+### 2. Backend (Flask API)
+
+The backend API should be deployed as a containerized application. For cost-effectiveness, use a platform that supports scaling to zero.
+
+- **Platform**: **Google Cloud Run** (Recommended), AWS App Runner, or Render.
+- **Why**: These platforms run your Docker containers in a serverless environment. You only pay when your API is receiving requests, which can dramatically lower costs compared to a traditional server that runs 24/7.
+- **Setup**:
+    1. Build and push the `backend` Docker image to a container registry (e.g., Docker Hub, Google Artifact Registry).
+    2. Create a new service on Google Cloud Run, using the image you just pushed.
+    3. Configure environment variables for the database, Redis, SuperTokens, etc., pointing to your managed services.
+
+### 3. YOLOE AI Service
+
+The AI service is the most resource-intensive part of the application. Running a GPU server 24/7 is extremely expensive. A serverless GPU platform is the ideal solution.
+
+- **Platform**: **RunPod** (Recommended), Replicate, or Banana.dev.
+- **Why**: These services allow you to deploy your model and pay *per-second* for GPU usage. This is the most cost-effective way to provide GPU-powered features.
+- **Setup**:
+    This repository has been prepared for a streamlined deployment to RunPod.
+    1.  **Build the Docker Image**: Use the provided `yoloe-service/Dockerfile.runpod` to build the service container. This Dockerfile is optimized for RunPod's serverless environment.
+        ```bash
+        docker build -t <your-docker-hub-username>/movecrm-yoloe:latest -f yoloe-service/Dockerfile.runpod ./yoloe-service
+        ```
+    2.  **Push to a Registry**: Push the built image to a container registry like Docker Hub or Google Artifact Registry.
+        ```bash
+        docker push <your-docker-hub-username>/movecrm-yoloe:latest
+        ```
+    3.  **Create a RunPod Endpoint**:
+        - Go to RunPod -> Serverless -> My Endpoints and create a new endpoint.
+        - Point the endpoint to the Docker image you just pushed.
+        - RunPod will provide you with an API endpoint URL.
+    4.  **Configure the Backend**:
+        - In your backend's environment variables (e.g., in Google Cloud Run), set `YOLOE_SERVICE_URL` to the API endpoint URL provided by RunPod.
+        - The backend will then send detection requests to your serverless GPU worker.
+
+### 4. Database, Cache, and Storage
+
+Using managed services for infrastructure is more reliable, scalable, and often cheaper than self-hosting, especially for smaller projects.
+
+- **Database (PostgreSQL)**: **Neon** or **Supabase** (both have free tiers).
+- **Cache (Redis)**: **Upstash** (has a serverless free tier).
+- **File Storage (S3)**: **Cloudflare R2** (zero egress fees) or **AWS S3**.
+- **Authentication**: Use the **SuperTokens Managed Cloud**.
+
+**Configuration**: To configure your application for these managed services, see the production environment templates:
+- `backend/.env.production.example`
+- `yoloe-service/.env.production.example`
+
+These files serve as a checklist for all the environment variables you will need to set in your production deployment environment (e.g., Google Cloud Run secrets, Vercel environment variables).
+
+### 5. Embeddable Widget
+
+The JavaScript widget is a static file that should be served from a CDN for best performance.
+
+- **Platform**: **Cloudflare R2** (Recommended for zero egress fees) or **AWS S3 + CloudFront**.
+- **Why**: Using a global CDN ensures the widget loads quickly for users anywhere in the world, with minimal cost. Serving it from a dedicated container is inefficient.
+- **Setup**:
+    1.  **Build the Widget**: Run the build script to minify the widget.
+        ```bash
+        cd widget
+        ./build.sh
+        ```
+    2.  **Upload to CDN**: Upload the minified widget from `widget/dist/movecrm-widget.min.js` to your chosen provider.
+
+        *Example using `wrangler` for Cloudflare R2:*
+        ```bash
+        # Make sure you have wrangler configured
+        wrangler r2 object put your-bucket-name/movecrm-widget.js --file widget/dist/movecrm-widget.min.js --content-type "application/javascript"
+        ```
+
+        *Example using AWS CLI for S3 (also works with R2):*
+        ```bash
+        aws s3 cp widget/dist/movecrm-widget.min.js s3://your-bucket-name/movecrm-widget.js --content-type "application/javascript" --acl public-read
+        ```
+    3.  **Update Your Website**: In your website's HTML, update the `<script>` tag to point to the new CDN URL of the widget.
+
 ## 🤝 Contributing
 
 1. Fork the repository

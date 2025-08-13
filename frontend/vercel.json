@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node",
+      "config": {
+        "installCommand": "pnpm install",
+        "buildCommand": "pnpm run build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/assets/.*",
+      "headers": {
+        "Cache-Control": "public, immutable, max-age=31536000"
+      }
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/.*",
+      "dest": "/index.html"
+    }
+  ]
+}
